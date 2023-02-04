@@ -1,20 +1,21 @@
 pipeline {
     agent { label "Jenkins_slave" }
     stages {
+        stage('Gitclone') {
+            steps {
+                git 'https://github.com/madhavivijay/hello-world-webapp.git'
+            }
+        }
         stage('Build') {
             steps {
+                sh 'mvn -Dmaven.test.failure.ignore=true clean package'
                 echo 'Building the project...'
                 // commands to build the project
             }
         }
-        stage('Test') {
+        stage('TomcatDeploy') {
             steps {
-                echo 'Running tests...'
-                // commands to run tests
-            }
-        }
-        stage('Deploy') {
-            steps {
+                deploy adapters: [tomcat8(credentialsId: 'Tomcat_login', path: '', url: 'http://3.109.181.21:8080')], contextPath: null, war: '**/*.war'
                 echo 'Deploying to production...'
                 // commands to deploy to production
             }
@@ -26,3 +27,4 @@ pipeline {
             }
         }
     }
+}
